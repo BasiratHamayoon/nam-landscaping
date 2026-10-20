@@ -10,6 +10,7 @@ export default function SectionHeading({
   center = true,
   className,
   light = false,
+  size = "default",
 }) {
   const headingRef = useRef(null)
 
@@ -25,12 +26,12 @@ export default function SectionHeading({
 
       gsap.fromTo(
         elements,
-        { y: 50, opacity: 0 },
+        { y: 60, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 1,
-          stagger: 0.15,
+          duration: 1.2,
+          stagger: 0.2,
           ease: "power3.out",
           scrollTrigger: {
             trigger: headingRef.current,
@@ -48,7 +49,7 @@ export default function SectionHeading({
     <div
       ref={headingRef}
       className={cn(
-        "mb-16 md:mb-20",
+        "mb-20 md:mb-24",
         center && "text-center",
         className
       )}
@@ -56,8 +57,8 @@ export default function SectionHeading({
       {badge && (
         <Badge
           className={cn(
-            "mb-4",
-            light && "bg-white/10 text-white/80 border-white/20"
+            "mb-5",
+            light && "bg-white/10 text-white/70 border-white/15"
           )}
         >
           {badge}
@@ -65,7 +66,10 @@ export default function SectionHeading({
       )}
       <h2
         className={cn(
-          "text-3xl md:text-4xl lg:text-5xl font-bold font-heading leading-tight mb-4",
+          "font-heading leading-[1.1] mb-5",
+          size === "large"
+            ? "text-4xl md:text-5xl lg:text-7xl"
+            : "text-3xl md:text-4xl lg:text-6xl",
           light ? "text-white" : "text-foreground"
         )}
       >
@@ -74,20 +78,14 @@ export default function SectionHeading({
       {subtitle && (
         <p
           className={cn(
-            "text-base md:text-lg max-w-2xl font-body leading-relaxed",
+            "text-base md:text-lg max-w-xl font-body leading-relaxed",
             center && "mx-auto",
-            light ? "text-white/70" : "text-muted-foreground"
+            light ? "text-white/50" : "text-muted-foreground"
           )}
         >
           {subtitle}
         </p>
       )}
-      <div
-        className={cn(
-          "mt-6 h-1 w-20 rounded-full bg-gradient-to-r from-primary-600 via-emerald-500 to-primary-700",
-          center && "mx-auto"
-        )}
-      />
     </div>
   )
 }

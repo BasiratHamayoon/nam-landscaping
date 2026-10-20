@@ -1,24 +1,45 @@
 "use client"
+
 import { useTheme } from "next-themes"
 import { Sun, Moon } from "lucide-react"
 import { useEffect, useState } from "react"
 
-export default function ThemeToggle() {
+export function ThemeToggle({ scrolled = false }) {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  if (!mounted) return null
+  if (!mounted) {
+    return <div className="w-9 h-9 rounded-full shrink-0" />
+  }
+
+  const isDark = theme === "dark"
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="relative w-10 h-10 rounded-xl bg-muted hover:bg-primary/10 flex items-center justify-center transition-all duration-300 group"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className={`relative flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 cursor-pointer overflow-hidden shrink-0 ${
+        scrolled
+          ? "bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/20"
+          : "bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-md"
+      }`}
       aria-label="Toggle theme"
     >
-      <Sun className="w-5 h-5 absolute transition-all duration-300 rotate-0 scale-100 dark:-rotate-90 dark:scale-0 text-yellow-600" />
-      <Moon className="w-5 h-5 absolute transition-all duration-300 rotate-90 scale-0 dark:rotate-0 dark:scale-100 text-primary-400" />
+      <Sun
+        className={`w-4 h-4 absolute transition-all duration-500 ease-in-out ${
+          isDark ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
+        }`}
+      />
+      <Moon
+        className={`w-4 h-4 absolute transition-all duration-500 ease-in-out ${
+          isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
+        }`}
+      />
     </button>
   )
 }
+
+export default ThemeToggle

@@ -1,83 +1,71 @@
 "use client"
-import Image from "next/image"
-import Badge from "../ui/Badge"
-import { MapPin, Calendar, ArrowUpRight } from "lucide-react"
+
+import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { ArrowUpRight, MapPin } from "lucide-react"
 
-export default function ProjectCard({ project, variant = "default" }) {
-  if (variant === "featured") {
-    return (
-      <div className="stagger-item group relative overflow-hidden rounded-3xl cursor-pointer hover-lift">
-        <div className="relative h-[400px] md:h-[500px]">
-          <Image
-            src={project.image}
-            alt={project.title}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-        </div>
+export function ProjectCard({ project, variant = "default", className }) {
+  if (!project) return null
 
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-          <Badge className="mb-3 bg-white/20 text-white border-white/30">
-            {project.category}
-          </Badge>
-          <h3 className="text-2xl md:text-3xl font-bold text-white font-heading mb-2">
-            {project.title}
-          </h3>
-          <p className="text-white/70 text-sm line-clamp-2 mb-4 font-body max-w-lg">
-            {project.description}
-          </p>
-          <div className="flex items-center gap-4 text-white/60 text-sm">
-            <span className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
-              {project.location}
-            </span>
-            <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              {project.year}
-            </span>
-          </div>
-        </div>
-
-        <div className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-45">
-          <ArrowUpRight className="w-5 h-5 text-white" />
-        </div>
-      </div>
-    )
-  }
+  const isFeatured = variant === "featured"
+  const image =
+    project.image ||
+    project.cover ||
+    project.thumbnail ||
+    "/images/10.jpg"
 
   return (
-    <div className="stagger-item group relative overflow-hidden rounded-2xl bg-card border border-border cursor-pointer hover-lift">
-      <div className="relative h-64 overflow-hidden">
-        <Image
-          src={project.image}
-          alt={project.title}
-          fill
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <Badge className="absolute top-4 left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
-          {project.category}
-        </Badge>
-      </div>
-      <div className="p-5">
-        <h3 className="text-lg font-bold font-heading mb-1 group-hover:text-primary transition-colors">
-          {project.title}
-        </h3>
-        <div className="flex items-center gap-3 text-muted-foreground text-xs font-body">
-          <span className="flex items-center gap-1">
-            <MapPin className="w-3 h-3" />
-            {project.location}
-          </span>
-          <span className="flex items-center gap-1">
-            <Calendar className="w-3 h-3" />
-            {project.year}
-          </span>
+    <Link
+      href={`/projects/${project.slug || project.id}`}
+      className={cn(
+        "group relative block w-full h-full overflow-hidden bg-muted",
+        className
+      )}
+    >
+      <img
+        src={image}
+        alt={project.title || "Project"}
+        className={cn(
+          "absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105",
+          isFeatured && "object-center"
+        )}
+        onError={(e) => {
+          e.currentTarget.src =
+            "https://images.unsplash.com/photo-1558904541-efa8c196b27d?auto=format&fit=crop&w=1200&q=80"
+        }}
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
+
+      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 lg:p-8 flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          {project.category && (
+            <span className="inline-block mb-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-primary-300">
+              {project.category}
+            </span>
+          )}
+          <h3
+            className={cn(
+              "font-heading text-white leading-tight truncate",
+              isFeatured ? "text-2xl sm:text-3xl lg:text-4xl" : "text-base sm:text-lg"
+            )}
+          >
+            {project.title}
+          </h3>
+          {project.location && (
+            <p className="mt-1.5 flex items-center gap-1.5 text-white/70 text-xs sm:text-sm">
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{project.location}</span>
+            </p>
+          )}
+        </div>
+
+        <div className="shrink-0 w-10 h-10 rounded-full border border-white/30 bg-white/10 backdrop-blur-md flex items-center justify-center text-white opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+          <ArrowUpRight className="w-4 h-4" />
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
+
+export default ProjectCard

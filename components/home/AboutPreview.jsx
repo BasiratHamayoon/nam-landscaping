@@ -2,23 +2,23 @@
 import { useRef, useEffect } from "react"
 import Image from "next/image"
 import { useSelector } from "react-redux"
-import Button from "../ui/Button"
-import Badge from "../ui/Badge"
-import CountUp from "../animations/CountUp"
-import FadeIn from "../animations/FadeIn"
+import { settingsData } from "@/store/data/settingsData"
+import Button from "@/components/ui/Button"
+import Badge from "@/components/ui/Badge"
+import CountUp from "@/components/animations/CountUp"
 import {
   ArrowRight,
   Award,
   Users,
   Clock,
-  Shield,
-  Leaf,
   CheckCircle2,
+  Leaf,
+  Shield,
 } from "lucide-react"
 
 export default function AboutPreview() {
-  const settings = useSelector((state) => state.settings)
-  const imageRef = useRef(null)
+  const settings = useSelector((state) => state.settings || settingsData)
+  const sectionRef = useRef(null)
 
   useEffect(() => {
     const loadGSAP = async () => {
@@ -26,123 +26,115 @@ export default function AboutPreview() {
       const { ScrollTrigger } = await import("gsap/ScrollTrigger")
       gsap.registerPlugin(ScrollTrigger)
 
-      if (!imageRef.current) return
+      if (!sectionRef.current) return
 
-      gsap.fromTo(
-        imageRef.current,
-        { clipPath: "inset(100% 0 0 0)" },
-        {
-          clipPath: "inset(0% 0 0 0)",
-          duration: 1.5,
-          ease: "power4.inOut",
-          scrollTrigger: {
-            trigger: imageRef.current,
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      )
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 70%",
+          toggleActions: "play none none reverse",
+        },
+      })
+
+      tl.fromTo(".about-image-wrapper", { clipPath: "inset(100% 0 0 0)", opacity: 0 }, { clipPath: "inset(0% 0 0 0)", opacity: 1, duration: 1.5, ease: "power4.inOut" })
+      tl.fromTo(".about-badge", { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6 }, "-=0.8")
+      tl.fromTo(".about-title", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }, "-=0.5")
+      tl.fromTo(".about-text", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 }, "-=0.4")
+      tl.fromTo(".about-feature", { x: -20, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, stagger: 0.08 }, "-=0.3")
+      tl.fromTo(".about-stat", { y: 30, opacity: 0, scale: 0.9 }, { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: "back.out(1.7)" }, "-=0.3")
+      tl.fromTo(".about-cta", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, "-=0.2")
+      tl.fromTo(".about-float-card", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, stagger: 0.15, ease: "back.out(1.7)" }, "-=0.8")
     }
 
     loadGSAP()
   }, [])
 
   return (
-    <section className="section-padding bg-muted/50 relative overflow-hidden">
+    <section ref={sectionRef} className="section-padding relative overflow-hidden bg-card">
       <div className="container-custom">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <FadeIn direction="left" className="relative">
-            <div ref={imageRef} className="relative">
-              <div className="relative h-[500px] md:h-[600px] rounded-3xl overflow-hidden">
-                <Image
-                  src="/images/3.jpg"
-                  alt="About NAM Landscaping"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div className="relative">
+            <div className="about-image-wrapper relative h-[550px] md:h-[650px] rounded-3xl overflow-hidden">
+              <Image
+                src="/images/3.jpg"
+                alt="About NAM Landscaping"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
 
-              <div className="absolute -bottom-6 -right-6 md:bottom-8 md:-right-8 glass-card rounded-2xl p-6 max-w-[200px]">
-                <div className="text-4xl font-bold text-primary font-heading">
-                  <CountUp end={settings.stats.yearsExperience} suffix="+" />
+            <div className="about-float-card absolute -bottom-6 -right-6 md:bottom-8 md:-right-8 bg-card rounded-2xl p-5 shadow-xl border border-border opacity-0">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white">
+                  <Award className="w-5 h-5" />
                 </div>
-                <p className="text-sm text-muted-foreground font-body mt-1">
-                  Years of Excellence
-                </p>
-              </div>
-
-              <div className="absolute -top-4 -left-4 md:top-8 md:-left-8 glass-card rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Award className="w-5 h-5 text-primary" />
+                <div>
+                  <div className="text-2xl font-heading">
+                    <CountUp end={settings.stats?.yearsExperience || 15} suffix="+" />
                   </div>
-                  <div>
-                    <div className="text-sm font-bold font-heading">Certified</div>
-                    <div className="text-xs text-muted-foreground font-body">Expert Team</div>
-                  </div>
+                  <div className="text-xs text-muted-foreground font-accent">Years Excellence</div>
                 </div>
               </div>
             </div>
 
-            <div className="absolute -z-10 top-10 left-10 w-full h-full rounded-3xl border-2 border-primary/10" />
-          </FadeIn>
+            <div className="about-float-card absolute -top-4 -left-4 md:top-8 md:-left-8 bg-card rounded-2xl p-4 shadow-xl border border-border opacity-0">
+              <div className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary-600" />
+                <span className="text-sm font-accent font-medium">Certified Team</span>
+              </div>
+            </div>
+          </div>
 
-          <FadeIn direction="right">
-            <Badge className="mb-4">About Us</Badge>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading leading-tight mb-6">
-              Crafting <span className="text-gradient">Natural Beauty</span> Since 2009
+          <div>
+            <div className="about-badge opacity-0">
+              <Badge className="mb-5">About Us</Badge>
+            </div>
+
+            <h2 className="about-title text-3xl md:text-4xl lg:text-5xl font-heading leading-[1.1] mb-7 opacity-0">
+              Crafting <em className="text-gradient">Natural Beauty</em> Since 2009
             </h2>
-            <p className="text-muted-foreground text-base leading-relaxed mb-6 font-body">
-              NAM Landscaping has been at the forefront of landscape design and garden services across the UAE. Our passion for creating stunning outdoor environments drives us to deliver exceptional results that exceed expectations.
-            </p>
-            <p className="text-muted-foreground text-base leading-relaxed mb-8 font-body">
-              With a team of experienced horticulturists, designers, and craftsmen, we transform ordinary spaces into extraordinary living environments that harmonize with nature.
+
+            <p className="about-text text-muted-foreground text-[15px] leading-[1.8] mb-5 font-body opacity-0">
+              NAM Landscaping has been at the forefront of landscape design and garden services across the UAE. Our passion for creating stunning outdoor environments drives us to deliver exceptional results.
             </p>
 
-            <div className="grid grid-cols-2 gap-4 mb-8">
+            <p className="about-text text-muted-foreground text-[15px] leading-[1.8] mb-8 font-body opacity-0">
+              With a team of experienced horticulturists, designers, and craftsmen, we transform ordinary spaces into extraordinary living environments.
+            </p>
+
+            <div className="grid grid-cols-2 gap-3 mb-8">
               {[
                 { icon: CheckCircle2, text: "Licensed & Insured" },
-                { icon: CheckCircle2, text: "Expert Design Team" },
-                { icon: CheckCircle2, text: "Quality Materials" },
-                { icon: CheckCircle2, text: "Timely Delivery" },
+                { icon: Leaf, text: "Eco-Friendly Methods" },
+                { icon: Award, text: "Award-Winning Design" },
+                { icon: Clock, text: "On-Time Delivery" },
               ].map((item, i) => {
                 const Icon = item.icon
                 return (
-                  <div key={i} className="flex items-center gap-2">
-                    <Icon className="w-5 h-5 text-primary flex-shrink-0" />
-                    <span className="text-sm font-medium font-body">{item.text}</span>
+                  <div key={i} className="about-feature flex items-center gap-2.5 opacity-0">
+                    <div className="w-8 h-8 rounded-full bg-primary-600/8 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4 text-primary-600" />
+                    </div>
+                    <span className="text-[13px] font-accent font-medium">{item.text}</span>
                   </div>
                 )
               })}
             </div>
 
-            <div className="grid grid-cols-3 gap-4 p-6 rounded-2xl bg-card border border-border mb-8">
+            <div className="grid grid-cols-3 gap-5 p-6 rounded-2xl bg-muted/50 mb-8">
               {[
-                {
-                  icon: Users,
-                  value: settings.stats.happyClients,
-                  label: "Happy Clients",
-                },
-                {
-                  icon: Award,
-                  value: settings.stats.projectsCompleted,
-                  label: "Projects Done",
-                },
-                {
-                  icon: Clock,
-                  value: settings.stats.yearsExperience,
-                  label: "Years Exp.",
-                },
+                { icon: Users, value: settings.stats?.happyClients || 350, label: "Clients" },
+                { icon: Award, value: settings.stats?.projectsCompleted || 500, label: "Projects" },
+                { icon: Clock, value: settings.stats?.yearsExperience || 15, label: "Years" },
               ].map((stat, i) => {
                 const Icon = stat.icon
                 return (
-                  <div key={i} className="text-center">
-                    <Icon className="w-5 h-5 text-primary mx-auto mb-2" />
-                    <div className="text-2xl font-bold font-heading text-foreground">
+                  <div key={i} className="about-stat text-center opacity-0">
+                    <div className="text-2xl md:text-3xl font-heading text-foreground mb-1">
                       <CountUp end={stat.value} suffix="+" />
                     </div>
-                    <div className="text-xs text-muted-foreground font-body">
+                    <div className="text-[11px] text-muted-foreground font-accent tracking-wider uppercase">
                       {stat.label}
                     </div>
                   </div>
@@ -150,11 +142,13 @@ export default function AboutPreview() {
               })}
             </div>
 
-            <Button variant="gradient" size="lg" className="group">
-              Discover Our Story
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </FadeIn>
+            <div className="about-cta opacity-0">
+              <Button variant="dark" size="lg" className="group">
+                Our Story
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-500" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,248 +1,165 @@
 "use client"
-import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
-import { useSelector } from "react-redux"
-import { settingsData } from "@/store/data/settingsData"
-import Button from "@/components/ui/Button"
-import MagneticButton from "@/components/animations/MagneticButton"
-import Badge from "@/components/ui/Badge"
-import {
-  ArrowRight,
-  Play,
-  Sparkles,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
 
-const heroSlides = [
+import { useState, useEffect, useRef } from "react"
+import Link from "next/link"
+import { ArrowRight, ChevronDown, Play, Leaf } from "lucide-react"
+import gsap from "gsap"
+import { Button } from "@/components/ui/Button"
+
+const slides = [
   {
     image: "/images/1.jpg",
+    fallback:
+      "https://images.unsplash.com/photo-1558904541-efa8c196b27d?auto=format&fit=crop&w=2000&q=80",
     subtitle: "Premium Landscaping Services",
-    title: "Transform Your\nOutdoor Paradise",
+    title: "We Craft Natural Beauty",
     description:
-      "We create breathtaking landscapes that blend natural beauty with innovative design, turning your outdoor dreams into reality.",
+      "Transforming outdoor spaces into breathtaking living masterpieces with expert design and craftsmanship across the UAE.",
   },
   {
     image: "/images/2.jpg",
-    subtitle: "Expert Garden Design",
-    title: "Where Nature\nMeets Luxury",
+    fallback:
+      "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=2000&q=80",
+    subtitle: "Garden Design & Architecture",
+    title: "Where Vision Meets Nature",
     description:
-      "From lush gardens to stunning pools, we craft outdoor spaces that inspire awe and provide lasting enjoyment.",
+      "From concept to completion, our expert team crafts luxurious gardens that thrive in the desert climate.",
   },
 ]
 
-export default function HeroSection() {
-  const [activeSlide, setActiveSlide] = useState(0)
-  const [mounted, setMounted] = useState(false)
-  const heroRef = useRef(null)
-  const contentRef = useRef(null)
-  const settings = useSelector((state) => state.settings || settingsData)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (!mounted) return
-
-    const animate = async () => {
-      const { gsap } = await import("gsap")
-
-      if (!contentRef.current) return
-
-      const tl = gsap.timeline({ delay: 3.6 })
-
-      tl.fromTo(
-        ".hero-badge",
-        { y: 30, opacity: 0, scale: 0.9 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.7)" }
-      )
-
-      tl.fromTo(
-        ".hero-title-line",
-        { y: 100, opacity: 0, skewY: 5 },
-        { y: 0, opacity: 1, skewY: 0, duration: 1, stagger: 0.15, ease: "power3.out" },
-        "-=0.4"
-      )
-
-      tl.fromTo(
-        ".hero-description",
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
-        "-=0.5"
-      )
-
-      tl.fromTo(
-        ".hero-buttons > *",
-        { y: 30, opacity: 0, scale: 0.9 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.7)" },
-        "-=0.4"
-      )
-
-      tl.fromTo(
-        ".hero-stats > *",
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: "power2.out" },
-        "-=0.3"
-      )
-
-      tl.fromTo(
-        ".hero-nav-controls",
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5 },
-        "-=0.2"
-      )
-    }
-
-    animate()
-  }, [mounted])
-
-  useEffect(() => {
-    if (!mounted) return
-
-    const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % heroSlides.length)
-    }, 6000)
-    return () => clearInterval(interval)
-  }, [mounted])
-
-  const currentSlide = heroSlides[activeSlide] || heroSlides[0]
-  const slideNum = String((activeSlide || 0) + 1).padStart(2, "0")
-  const totalNum = String(heroSlides.length).padStart(2, "0")
-  const projectsCount = settings?.stats?.projectsCompleted || 500
-  const clientsCount = settings?.stats?.happyClients || 350
-  const yearsCount = settings?.stats?.yearsExperience || 15
+function HeroImage({ slide, isActive }) {
+  const [imgSrc, setImgSrc] = useState(slide.image)
 
   return (
-    <section ref={heroRef} className="relative h-screen min-h-[700px] overflow-hidden">
-      {heroSlides.map((slide, index) => (
-        <div
-          key={index}
-          className="absolute inset-0 transition-opacity duration-1000"
-          style={{ opacity: activeSlide === index ? 1 : 0 }}
-        >
-          <Image
-            src={slide.image}
-            alt={slide.title}
-            fill
-            className="object-cover"
-            priority={index === 0}
-            sizes="100vw"
-          />
-        </div>
+    <div
+      className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+        isActive ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <img
+        src={imgSrc}
+        alt={slide.subtitle}
+        onError={() => setImgSrc(slide.fallback)}
+        className="w-full h-full object-cover"
+      />
+    </div>
+  )
+}
+
+export function HeroSection() {
+  const [current, setCurrent] = useState(0)
+  const sectionRef = useRef(null)
+  const textRef = useRef(null)
+
+  const slideCount = slides.length
+  const safeIndex = typeof current === "number" && !isNaN(current) ? current : 0
+  const displayCurrent = String(safeIndex + 1).padStart(2, "0")
+  const displayTotal = String(slideCount).padStart(2, "0")
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        textRef.current?.querySelectorAll(".hero-line") || [],
+        { y: 50, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+          delay: 0.3,
+        }
+      )
+    }, sectionRef)
+    return () => ctx.revert()
+  }, [safeIndex])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slideCount)
+    }, 6000)
+    return () => clearInterval(interval)
+  }, [slideCount])
+
+  const slide = slides[safeIndex] || slides[0]
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative h-screen w-full overflow-hidden bg-[#0a0f0c] text-white"
+    >
+      {slides.map((s, i) => (
+        <HeroImage key={i} slide={s} isActive={i === safeIndex} />
       ))}
 
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0c] via-transparent to-black/40 z-10" />
 
-      <div ref={contentRef} className="relative h-full container-custom flex items-center">
-        <div className="max-w-3xl">
-          <div className="hero-badge opacity-0">
-            <Badge className="mb-6 bg-white/10 text-white border-white/20 py-2 px-4 text-sm backdrop-blur-sm">
-              <Sparkles className="w-3.5 h-3.5 mr-2 text-primary-400" />
-              {currentSlide.subtitle}
-            </Badge>
+      <div className="relative z-20 flex flex-col justify-center h-full px-6 sm:px-10 lg:px-16 max-w-7xl mx-auto pt-28 lg:pt-36 pb-24">
+        <div ref={textRef} className="max-w-3xl">
+          <div className="hero-line overflow-hidden">
+            <span className="inline-flex items-center gap-2 text-primary-400 text-xs sm:text-sm font-semibold tracking-[0.25em] uppercase mb-6 bg-primary-950/60 border border-primary-500/30 px-4 py-1.5 rounded-full backdrop-blur-md">
+              <Leaf className="w-4 h-4" />
+              {slide.subtitle}
+            </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading text-white leading-[1.1] mb-6">
-            {currentSlide.title.split("\n").map((line, i) => (
-              <span key={i} className="hero-title-line block opacity-0">
-                {i === 1 ? (
-                  <span className="bg-gradient-to-r from-primary-400 via-emerald-400 to-lime-400 bg-clip-text text-transparent">
-                    {line}
-                  </span>
-                ) : (
-                  line
-                )}
-              </span>
-            ))}
+          <h1 className="hero-line overflow-hidden">
+            <span className="block font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-white leading-[1.08] tracking-tight drop-shadow-lg">
+              {slide.title}
+            </span>
           </h1>
 
-          <p className="hero-description text-lg md:text-xl text-white/70 max-w-xl font-body leading-relaxed mb-8 opacity-0">
-            {currentSlide.description}
-          </p>
+          <div className="hero-line overflow-hidden mt-6">
+            <p className="text-white/80 text-base md:text-lg max-w-xl leading-relaxed font-body">
+              {slide.description}
+            </p>
+          </div>
 
-          <div className="hero-buttons flex flex-wrap gap-4 mb-12">
-            <MagneticButton>
-              <Button variant="gradient" size="xl" className="group">
+          <div className="hero-line overflow-hidden mt-10 flex flex-wrap items-center gap-4">
+            <Link href="/contact">
+              <Button size="lg" className="rounded-full px-8 text-base shadow-xl">
                 Get Free Quote
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </MagneticButton>
-            <MagneticButton>
+            </Link>
+            <Link href="/projects">
               <Button
-                variant="ghost"
-                size="xl"
-                className="text-white border border-white/20 hover:bg-white/10 group"
+                size="lg"
+                variant="outline"
+                className="rounded-full px-8 text-base"
               >
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-2 group-hover:bg-primary-600/30 transition-colors">
-                  <Play className="w-4 h-4 fill-white ml-0.5" />
-                </div>
-                Watch Our Work
+                <Play className="w-4 h-4 mr-2" />
+                View Projects
               </Button>
-            </MagneticButton>
-          </div>
-
-          <div className="hero-stats flex flex-wrap items-center gap-8 border-t border-white/10 pt-8">
-            <div className="opacity-0">
-              <div className="text-2xl md:text-3xl font-bold text-white font-heading">
-                {projectsCount}+
-              </div>
-              <div className="text-sm text-white/50 font-body">Projects</div>
-            </div>
-            <div className="opacity-0">
-              <div className="text-2xl md:text-3xl font-bold text-white font-heading">
-                {clientsCount}+
-              </div>
-              <div className="text-sm text-white/50 font-body">Happy Clients</div>
-            </div>
-            <div className="opacity-0">
-              <div className="text-2xl md:text-3xl font-bold text-white font-heading">
-                {yearsCount}+
-              </div>
-              <div className="text-sm text-white/50 font-body">Years</div>
-            </div>
+            </Link>
           </div>
         </div>
 
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-3">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                activeSlide === index
-                  ? "bg-primary-500 scale-125 shadow-lg shadow-primary-500/50"
-                  : "bg-white/30 hover:bg-white/50"
-              }`}
+        <div className="absolute bottom-10 left-6 sm:left-10 lg:left-16 flex items-center gap-6 z-20">
+          <div className="flex items-baseline gap-1 text-white">
+            <span className="font-heading text-3xl font-bold">{displayCurrent}</span>
+            <span className="text-white/40 text-sm mx-1">/</span>
+            <span className="text-white/40 text-sm">{displayTotal}</span>
+          </div>
+          <div className="w-24 h-[2px] bg-white/20 relative overflow-hidden rounded-full">
+            <div
+              className="absolute top-0 left-0 h-full bg-primary-500 transition-all duration-500"
+              style={{ width: `${((safeIndex + 1) / slideCount) * 100}%` }}
             />
-          ))}
+          </div>
         </div>
 
-        <div className="hero-nav-controls absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 opacity-0">
-          <button
-            onClick={() =>
-              setActiveSlide(
-                activeSlide === 0 ? heroSlides.length - 1 : activeSlide - 1
-              )
-            }
-            className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 flex items-center justify-center transition-all text-white"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <div className="text-white/50 text-sm font-body tracking-wider">
-            {slideNum} / {totalNum}
-          </div>
-          <button
-            onClick={() =>
-              setActiveSlide((activeSlide + 1) % heroSlides.length)
-            }
-            className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 flex items-center justify-center transition-all text-white"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
+        <button
+          onClick={() => setCurrent((prev) => (prev + 1) % slideCount)}
+          className="absolute bottom-10 right-6 sm:right-10 lg:right-16 w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all cursor-pointer z-20 backdrop-blur-md"
+          aria-label="Next slide"
+        >
+          <ChevronDown className="w-5 h-5" />
+        </button>
       </div>
     </section>
   )
 }
+
+export default HeroSection

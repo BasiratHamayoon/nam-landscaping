@@ -1,48 +1,75 @@
 "use client"
+import { useEffect, useRef } from "react"
 import { useSelector } from "react-redux"
+import { servicesData } from "@/store/data/servicesData"
 import SectionHeading from "@/components/shared/SectionHeading"
 import ServiceCard from "@/components/shared/ServiceCard"
-import { useStaggerAnimation } from "@/hooks/useScrollAnimation"
 import Button from "@/components/ui/Button"
 import { ArrowRight } from "lucide-react"
-import FadeIn from "@/components/animations/FadeIn"
-import { servicesData } from "@/store/data/servicesData"
 
 export default function ServicesSection() {
   const services = useSelector((state) => state.services?.items || servicesData)
-  const containerRef = useStaggerAnimation({
-    selector: ".stagger-item",
-    stagger: 0.12,
-    ease: "back.out(1.7)",
-  })
+  const sectionRef = useRef(null)
+  const cardsRef = useRef(null)
+
+  useEffect(() => {
+    const loadGSAP = async () => {
+      const { gsap } = await import("gsap")
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger")
+      gsap.registerPlugin(ScrollTrigger)
+
+      if (!sectionRef.current || !cardsRef.current) return
+
+      const cards = cardsRef.current.querySelectorAll(".stagger-item")
+
+      gsap.fromTo(
+        cards,
+        { y: 100, opacity: 0, rotateY: -5 },
+        {
+          y: 0,
+          opacity: 1,
+          rotateY: 0,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 70%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+    }
+
+    loadGSAP()
+  }, [])
 
   return (
-    <section className="section-padding bg-background relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+    <section ref={sectionRef} className="section-padding relative overflow-hidden">
+      <div className="absolute inset-0 gradient-mesh" />
 
       <div className="container-custom relative">
         <SectionHeading
-          badge="What We Offer"
-          title="Our Premium Services"
-          subtitle="From stunning garden designs to complete outdoor transformations, we offer a full range of landscaping services tailored to your vision."
+          badge="Services"
+          title="What We Do Best"
+          subtitle="Expert craftsmanship meets creative vision in every project we undertake."
         />
 
         <div
-          ref={containerRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+          ref={cardsRef}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7"
         >
           {services.map((service, index) => (
             <ServiceCard key={service.id} service={service} index={index} />
           ))}
         </div>
 
-        <FadeIn className="text-center mt-12">
-          <Button variant="outline" size="lg" className="group">
-            View All Services
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        <div className="text-center mt-14">
+          <Button variant="dark" size="lg" className="group">
+            All Services
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-500" />
           </Button>
-        </FadeIn>
+        </div>
       </div>
     </section>
   )
