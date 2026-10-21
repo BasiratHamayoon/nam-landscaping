@@ -1,254 +1,301 @@
 "use client"
-import Link from "next/link"
+
+import { useState } from "react"
 import { useSelector } from "react-redux"
-import { useRef, useEffect } from "react"
+import Link from "next/link"
 import {
   Leaf,
   Phone,
   Mail,
   MapPin,
   Clock,
-  ArrowUpRight,
-  Heart,
-  ChevronUp,
+  ArrowRight,
+  MessageCircle,
+  Send,
+  CheckCircle2,
 } from "lucide-react"
+import { settingsData } from "@/store/data/settingsData"
 
-const FacebookIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-  </svg>
-)
+function InstagramIcon(props) {
+  return (
+    <svg
+      {...props}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  )
+}
 
-const InstagramIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-  </svg>
-)
+function FacebookIcon(props) {
+  return (
+    <svg
+      {...props}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  )
+}
 
-const TwitterIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-  </svg>
-)
-
-const LinkedinIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-  </svg>
-)
-
-const footerLinks = {
-  services: [
-    { name: "Landscaping Design", href: "/services#landscaping" },
-    { name: "Garden Maintenance", href: "/services#maintenance" },
-    { name: "Swimming Pools", href: "/services#pool" },
-    { name: "Irrigation Systems", href: "/services#irrigation" },
-    { name: "Pergolas", href: "/services#pergolas" },
-    { name: "Outdoor Lighting", href: "/services#lighting" },
-  ],
-  company: [
-    { name: "About Us", href: "/about" },
-    { name: "Our Projects", href: "/projects" },
-    { name: "Gallery", href: "/gallery" },
-    { name: "Testimonials", href: "/#testimonials" },
-    { name: "FAQs", href: "/#faq" },
-    { name: "Contact Us", href: "/contact" },
-  ],
+function LinkedinIcon(props) {
+  return (
+    <svg
+      {...props}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect width="4" height="12" x="2" y="9" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  )
 }
 
 export default function Footer() {
-  const settings = useSelector((state) => state.settings)
-  const footerRef = useRef(null)
+  const reduxSettings = useSelector(
+    (state) => state.settings?.data || state.settings?.items || state.settings
+  )
 
-  useEffect(() => {
-    const loadGSAP = async () => {
-      const { gsap } = await import("gsap")
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger")
-      gsap.registerPlugin(ScrollTrigger)
+  const [subscribed, setSubscribed] = useState(false)
+  const [email, setEmail] = useState("")
 
-      if (!footerRef.current) return
+  const phone = reduxSettings?.phone || settingsData?.phone || "+971 4 123 4567"
+  const whatsapp = reduxSettings?.whatsapp || settingsData?.whatsapp || "+971 50 123 4567"
+  const emailAddr = reduxSettings?.email || settingsData?.email || "info@namlandscaping.ae"
+  const address = reduxSettings?.address || settingsData?.address || "Al Quoz Industrial Area 3, Dubai, UAE"
+  const workingHours = reduxSettings?.workingHours || settingsData?.workingHours || "Mon - Sat: 8:00 AM - 6:00 PM"
+  const socials = {
+    instagram: reduxSettings?.socials?.instagram || settingsData?.socials?.instagram || "https://instagram.com",
+    facebook: reduxSettings?.socials?.facebook || settingsData?.socials?.facebook || "https://facebook.com",
+    linkedin: reduxSettings?.socials?.linkedin || settingsData?.socials?.linkedin || "https://linkedin.com",
+    whatsapp: reduxSettings?.socials?.whatsapp || settingsData?.socials?.whatsapp || `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`,
+  }
 
-      const elements = footerRef.current.querySelectorAll(".footer-animate")
-      gsap.fromTo(
-        elements,
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: footerRef.current,
-            start: "top 90%",
-            toggleActions: "play none none none",
-          },
-        }
-      )
+  const quickLinks = [
+    { label: "Home", href: "/" },
+    { label: "About Us", href: "/about" },
+    { label: "Services", href: "/services" },
+    { label: "Projects", href: "/projects" },
+    { label: "Gallery", href: "/gallery" },
+    { label: "Contact Us", href: "/contact" },
+  ]
+
+  const serviceLinks = [
+    { label: "Garden Design & Landscaping", href: "/services" },
+    { label: "Swimming Pool Construction", href: "/services" },
+    { label: "Smart Irrigation Systems", href: "/services" },
+    { label: "Soft & Hard Landscaping", href: "/services" },
+    { label: "Outdoor Lighting & Pergolas", href: "/services" },
+    { label: "Landscape Maintenance", href: "/services" },
+  ]
+
+  const handleSubscribe = (e) => {
+    e.preventDefault()
+    if (email.trim()) {
+      setSubscribed(true)
+      setEmail("")
     }
-
-    loadGSAP()
-  }, [])
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   return (
-    <footer ref={footerRef} className="relative bg-primary-950 text-white overflow-hidden">
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 text-8xl">🌿</div>
-        <div className="absolute top-40 right-20 text-6xl">🍃</div>
-        <div className="absolute bottom-20 left-1/3 text-7xl">🌱</div>
+    <footer className="relative bg-[#0a0f0c] text-white pt-20 pb-10 overflow-hidden border-t border-white/10 z-20">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary-600/10 rounded-full blur-[140px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[140px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,_rgba(255,255,255,0.03)_1px,_transparent_0)] bg-[size:32px_32px]" />
       </div>
 
-      <div className="container-custom pt-20 pb-8 relative">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
-          <div className="footer-animate lg:col-span-1">
-            <Link href="/" className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-primary-600 flex items-center justify-center">
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 pb-16 border-b border-white/10">
+          <div className="lg:col-span-4 space-y-6">
+            <Link href="/" className="inline-flex items-center gap-3 cursor-pointer group">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-primary-500/30 group-hover:scale-105 transition-transform">
                 <Leaf className="w-6 h-6" />
               </div>
-              <div>
-                <span className="text-2xl font-bold font-heading">NAM</span>
-                <span className="block text-[10px] tracking-[3px] uppercase text-primary-400 font-body -mt-1">
-                  Landscaping
+              <div className="flex flex-col">
+                <span className="font-heading text-2xl font-bold tracking-tight text-white leading-none">
+                  NAM
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.25em] text-emerald-400 font-semibold mt-1">
+                  Landscaping UAE
                 </span>
               </div>
             </Link>
-            <p className="text-white/60 text-sm leading-relaxed font-body mb-6 max-w-xs">
-              Transforming outdoor spaces into living masterpieces. We bring nature&apos;s beauty to your doorstep with expert craftsmanship and creative design.
+
+            <p className="text-sm text-white/70 leading-relaxed max-w-sm">
+              UAE&apos;s premier landscape architecture and outdoor living studio. Sculpting climate-adapted residential gardens, resort pools, and commercial sanctuaries across Dubai and Abu Dhabi.
             </p>
-            <div className="flex items-center gap-3">
-              {[
-                { icon: InstagramIcon, href: settings.socialLinks.instagram },
-                { icon: FacebookIcon, href: settings.socialLinks.facebook },
-                { icon: TwitterIcon, href: settings.socialLinks.twitter },
-                { icon: LinkedinIcon, href: settings.socialLinks.linkedin },
-              ].map((social, i) => {
-                const Icon = social.icon
-                return (
-                  <a
-                    key={i}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-xl bg-white/5 hover:bg-primary-600 hover:scale-110 flex items-center justify-center transition-all duration-300"
-                  >
-                    <Icon className="w-4 h-4" />
-                  </a>
-                )
-              })}
+
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href={socials.instagram}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram"
+                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-emerald-600 hover:border-emerald-600 transition-all cursor-pointer hover:scale-110"
+              >
+                <InstagramIcon className="w-4 h-4" />
+              </a>
+              <a
+                href={socials.facebook}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-emerald-600 hover:border-emerald-600 transition-all cursor-pointer hover:scale-110"
+              >
+                <FacebookIcon className="w-4 h-4" />
+              </a>
+              <a
+                href={socials.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn"
+                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-emerald-600 hover:border-emerald-600 transition-all cursor-pointer hover:scale-110"
+              >
+                <LinkedinIcon className="w-4 h-4" />
+              </a>
+              <a
+                href={socials.whatsapp}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="WhatsApp"
+                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/80 hover:text-white hover:bg-emerald-600 hover:border-emerald-600 transition-all cursor-pointer hover:scale-110"
+              >
+                <MessageCircle className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
-          <div className="footer-animate">
-            <h3 className="text-lg font-bold font-heading mb-6 flex items-center gap-2">
-              <div className="w-1.5 h-6 rounded-full bg-primary-600" />
-              Our Services
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.services.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-primary-400 text-sm font-body flex items-center gap-2 group transition-colors"
-                  >
-                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="footer-animate">
-            <h3 className="text-lg font-bold font-heading mb-6 flex items-center gap-2">
-              <div className="w-1.5 h-6 rounded-full bg-primary-600" />
+          <div className="lg:col-span-2 space-y-4">
+            <h4 className="font-heading text-lg text-white font-semibold tracking-wide">
               Quick Links
-            </h3>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
+            </h4>
+            <ul className="space-y-2.5">
+              {quickLinks.map((link, i) => (
+                <li key={i}>
                   <Link
                     href={link.href}
-                    className="text-white/60 hover:text-primary-400 text-sm font-body flex items-center gap-2 group transition-colors"
+                    className="text-sm text-white/70 hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5 cursor-pointer group"
                   >
-                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all -ml-5 group-hover:ml-0" />
-                    {link.name}
+                    <ArrowRight className="w-3 h-3 text-emerald-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                    <span>{link.label}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="footer-animate">
-            <h3 className="text-lg font-bold font-heading mb-6 flex items-center gap-2">
-              <div className="w-1.5 h-6 rounded-full bg-primary-600" />
-              Contact Info
-            </h3>
-            <ul className="space-y-4">
-              <li>
-                <a
-                  href={`tel:${settings.phone}`}
-                  className="flex items-start gap-3 text-white/60 hover:text-primary-400 transition-colors group"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-white/5 group-hover:bg-primary-600/20 flex items-center justify-center flex-shrink-0 transition-colors">
-                    <Phone className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-body block">{settings.phone}</span>
-                    <span className="text-xs text-white/40">Call us anytime</span>
-                  </div>
+          <div className="lg:col-span-3 space-y-4">
+            <h4 className="font-heading text-lg text-white font-semibold tracking-wide">
+              Our Services
+            </h4>
+            <ul className="space-y-2.5">
+              {serviceLinks.map((link, i) => (
+                <li key={i}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-white/70 hover:text-emerald-400 transition-colors inline-flex items-center gap-1.5 cursor-pointer group"
+                  >
+                    <ArrowRight className="w-3 h-3 text-emerald-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                    <span>{link.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-3 space-y-5">
+            <h4 className="font-heading text-lg text-white font-semibold tracking-wide">
+              Get In Touch
+            </h4>
+            <ul className="space-y-3.5 text-sm text-white/80">
+              <li className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-1" />
+                <span>{address}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+                <a href={`tel:${phone}`} className="hover:text-emerald-400 transition-colors">
+                  {phone}
                 </a>
               </li>
-              <li>
-                <a
-                  href={`mailto:${settings.email}`}
-                  className="flex items-start gap-3 text-white/60 hover:text-primary-400 transition-colors group"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-white/5 group-hover:bg-primary-600/20 flex items-center justify-center flex-shrink-0 transition-colors">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-body block">{settings.email}</span>
-                    <span className="text-xs text-white/40">Email us</span>
-                  </div>
+              <li className="flex items-center gap-3">
+                <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
+                <a href={`mailto:${emailAddr}`} className="hover:text-emerald-400 transition-colors">
+                  {emailAddr}
                 </a>
               </li>
-              <li className="flex items-start gap-3 text-white/60">
-                <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-sm font-body block">{settings.address}</span>
-                  <span className="text-xs text-white/40">Visit us</span>
-                </div>
-              </li>
-              <li className="flex items-start gap-3 text-white/60">
-                <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-sm font-body block">{settings.workingHours}</span>
-                  <span className="text-xs text-white/40">Working hours</span>
-                </div>
+              <li className="flex items-center gap-3">
+                <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{workingHours}</span>
               </li>
             </ul>
+
+            <div className="pt-2">
+              <form onSubmit={handleSubscribe} className="space-y-2">
+                <span className="text-xs uppercase tracking-wider text-emerald-400 font-semibold">
+                  Subscribe to Newsletter
+                </span>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    className="w-full h-11 pl-4 pr-12 rounded-full bg-white/5 border border-white/15 text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    aria-label="Subscribe"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center cursor-pointer transition-all"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                {subscribed && (
+                  <p className="text-[11px] text-emerald-400 flex items-center gap-1 mt-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Thank you for subscribing!
+                  </p>
+                )}
+              </form>
+            </div>
           </div>
         </div>
 
-        <div className="footer-animate border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-white/40 text-sm font-body text-center md:text-left">
-            © {new Date().getFullYear()} NAM Landscaping. All rights reserved. Made with{" "}
-            <Heart className="w-3 h-3 inline text-red-500 fill-red-500" /> in UAE
-          </p>
-          <button
-            onClick={scrollToTop}
-            className="w-10 h-10 rounded-xl bg-white/5 hover:bg-primary-600 flex items-center justify-center transition-all duration-300 hover:-translate-y-1"
-          >
-            <ChevronUp className="w-5 h-5" />
-          </button>
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
+          <p>© {new Date().getFullYear()} NAM Landscaping Services UAE. All Rights Reserved.</p>
+          <div className="flex items-center gap-6">
+            <Link href="/contact" className="hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <span>·</span>
+            <Link href="/contact" className="hover:text-white transition-colors">
+              Terms of Service
+            </Link>
+            <span>·</span>
+            <Link href="/contact" className="hover:text-white transition-colors">
+              Sitemap
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
