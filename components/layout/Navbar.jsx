@@ -19,10 +19,11 @@ const navLinks = [
 function BrandLogo({ scrolled }) {
   const [imgError, setImgError] = useState(false)
 
+  // Robust SVG Fallback per constraints (prevents broken image box)
   if (imgError) {
     return (
-      <div className="flex items-center gap-2.5 group">
-        <div className="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white shadow-md shadow-primary-600/30 group-hover:scale-105 transition-transform">
+      <div className="flex items-center gap-2.5 group cursor-pointer">
+        <div className="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white shadow-md shadow-primary-600/30 group-hover:scale-110 transition-transform duration-300 ease-out">
           <Leaf className="w-5 h-5" />
         </div>
         <div className="flex flex-col">
@@ -46,7 +47,7 @@ function BrandLogo({ scrolled }) {
       src="/images/logo.png"
       alt="NAM Landscaping"
       onError={() => setImgError(true)}
-      className="h-10 w-auto object-contain drop-shadow-md"
+      className="h-10 w-auto object-contain drop-shadow-md cursor-pointer"
     />
   )
 }
@@ -92,19 +93,19 @@ export function Navbar() {
               <div className="flex items-center gap-6">
                 <a
                   href="tel:+971501234567"
-                  className="flex items-center gap-1.5 hover:text-primary-400 transition-colors"
+                  className="flex items-center gap-1.5 hover:text-primary-400 transition-colors cursor-pointer"
                 >
                   <Phone className="w-3.5 h-3.5" />
                   +971 50 123 4567
                 </a>
                 <a
                   href="mailto:info@namlandscaping.ae"
-                  className="flex items-center gap-1.5 hover:text-primary-400 transition-colors"
+                  className="flex items-center gap-1.5 hover:text-primary-400 transition-colors cursor-pointer"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   info@namlandscaping.ae
                 </a>
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 cursor-default">
                   <MapPin className="w-3.5 h-3.5" />
                   Dubai, UAE
                 </span>
@@ -131,7 +132,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-[13px] font-semibold tracking-[0.08em] uppercase transition-colors duration-300 ${
+                className={`text-[13px] font-semibold tracking-[0.08em] uppercase transition-colors duration-300 cursor-pointer ${
                   scrolled
                     ? "text-gray-800 hover:text-primary-600 dark:text-white dark:hover:text-primary-400"
                     : "text-white hover:text-primary-300"
@@ -145,7 +146,9 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-4">
             {scrolled && <ThemeToggle scrolled={true} />}
             <Link href="/contact">
-              <Button className="rounded-full px-6">Get a Quote</Button>
+              <Button className="rounded-full px-6 cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-primary-500/40 transition-all duration-300">
+                Get a Quote
+              </Button>
             </Link>
           </div>
 
@@ -153,7 +156,7 @@ export function Navbar() {
             <ThemeToggle scrolled={scrolled} />
             <button
               onClick={() => setMobileOpen(true)}
-              className={`p-2 rounded-full transition-colors cursor-pointer ${
+              className={`p-2 rounded-full transition-all duration-300 cursor-pointer hover:scale-105 ${
                 scrolled
                   ? "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10"
                   : "text-white hover:bg-white/10"
