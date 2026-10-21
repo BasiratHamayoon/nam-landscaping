@@ -1,7 +1,9 @@
+
 import Navbar from "@/components/layout/Navbar"
 import "./globals.css"
 import Providers from "./providers"
 import Footer from "@/components/layout/Footer"
+
 
 
 export const metadata = {
@@ -46,7 +48,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/images/logo.png" />
         <meta name="theme-color" content="#16a34a" />
       </head>
-      <body className="antialiased noise-bg">
+      <body className="antialiased noise-bg" suppressHydrationWarning>
         <Providers>
           <Navbar />
           <main className="min-h-screen">{children}</main>

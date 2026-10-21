@@ -1,26 +1,28 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { testimonialsData } from "../data/testimonialsData"
 
+const initialState = {
+  items: testimonialsData,
+  activeIndex: 0,
+}
+
 const testimonialsSlice = createSlice({
   name: "testimonials",
-  initialState: {
-    items: testimonialsData,
-    activeIndex: 0,
-  },
+  initialState,
   reducers: {
-    setActiveIndex: (state, action) => {
-      state.activeIndex = action.payload
-    },
     nextTestimonial: (state) => {
-      state.activeIndex = (state.activeIndex + 1) % state.items.length
+      const length = state.items?.length || 1
+      state.activeIndex = (state.activeIndex + 1) % length
     },
     prevTestimonial: (state) => {
-      state.activeIndex =
-        state.activeIndex === 0 ? state.items.length - 1 : state.activeIndex - 1
+      const length = state.items?.length || 1
+      state.activeIndex = (state.activeIndex - 1 + length) % length
+    },
+    setTestimonial: (state, action) => {
+      state.activeIndex = action.payload
     },
   },
 })
 
-export const { setActiveIndex, nextTestimonial, prevTestimonial } =
-  testimonialsSlice.actions
+export const { nextTestimonial, prevTestimonial, setTestimonial } = testimonialsSlice.actions
 export default testimonialsSlice.reducer

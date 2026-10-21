@@ -27,100 +27,148 @@ export function ProjectsShowcase() {
 
   const sectionRef = useRef(null)
   const gridRef = useRef(null)
-  const hasAnimated = useRef(false)
 
   const featured = filteredItems.filter((p) => p.featured)
   const pool = featured.length >= 5 ? featured : filteredItems
   const displayProjects = pool.slice(0, 5)
 
+  // Arrival GSAP Timeline on Scroll
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
     const ctx = gsap.context(() => {
-      const cards = sectionRef.current?.querySelectorAll(".project-animate")
-      if (!cards?.length) return
-
-      gsap.set(cards, { opacity: 1, y: 0, scale: 1 })
-
-      gsap.from(cards, {
+      const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: gridRef.current,
-          start: "top 85%",
+          trigger: sectionRef.current,
+          start: "top 75%",
           toggleActions: "play none none none",
           once: true,
         },
-        y: 50,
-        opacity: 0,
-        scale: 0.97,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-        clearProps: "transform",
-        onComplete: () => {
-          hasAnimated.current = true
-          gsap.set(cards, { clearProps: "all" })
-        },
       })
 
-      gsap.from(".ps-header", {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 85%",
-          once: true,
-        },
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power3.out",
-      })
+      // 1. Header 3D Tilt Reveal
+      tl.fromTo(
+        ".ps-header",
+        { y: 60, opacity: 0, rotateX: -15 },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 1,
+          ease: "power3.out",
+        }
+      )
 
-      gsap.from(".ps-pill", {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-          once: true,
+      // 2. Filter Pills Elastic Stagger
+      tl.fromTo(
+        ".ps-pill",
+        { y: 30, opacity: 0, scale: 0.8 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.6,
+          stagger: 0.04,
+          ease: "back.out(1.7)",
         },
-        y: 16,
-        opacity: 0,
-        duration: 0.45,
-        stagger: 0.04,
-        ease: "power3.out",
-      })
+        "-=0.6"
+      )
+
+      // 3. Featured Large Portrait Card Sweep In from Left
+      tl.fromTo(
+        ".featured-card-wrapper",
+        { x: -80, y: 40, opacity: 0, scale: 0.9, rotateY: 8 },
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          rotateY: 0,
+          duration: 1.1,
+          ease: "power4.out",
+        },
+        "-=0.4"
+      )
+
+      // 4. 4 Small Cards Stagger In from Right
+      tl.fromTo(
+        ".small-card-wrapper",
+        { x: 60, y: 40, opacity: 0, scale: 0.88, rotateY: -8 },
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          rotateY: 0,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: "power4.out",
+        },
+        "-=0.9"
+      )
+
+      // 5. Cinematic Image Camera Scale Down Zoom
+      tl.fromTo(
+        ".project-img",
+        { scale: 1.35, filter: "brightness(0.6)" },
+        {
+          scale: 1,
+          filter: "brightness(1)",
+          duration: 1.4,
+          stagger: 0.08,
+          ease: "power3.out",
+        },
+        "-=1.1"
+      )
     }, sectionRef)
 
     return () => ctx.revert()
   }, [])
 
+  // Smooth Category Filter Morph Animation
   useEffect(() => {
-    if (!gridRef.current || !hasAnimated.current) return
+    if (!gridRef.current) return
 
-    const cards = gridRef.current.querySelectorAll(".project-animate")
-    if (!cards.length) return
+    const ctx = gsap.context(() => {
+      const cards = gridRef.current.querySelectorAll(".project-animate-item")
+      const imgs = gridRef.current.querySelectorAll(".project-img")
 
-    gsap.fromTo(
-      cards,
-      { y: 24, opacity: 0.35 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.45,
-        stagger: 0.06,
-        ease: "power2.out",
-        overwrite: true,
-        clearProps: "transform",
-      }
-    )
+      gsap.fromTo(
+        cards,
+        { y: 30, opacity: 0, scale: 0.95 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.6,
+          stagger: 0.07,
+          ease: "power3.out",
+          overwrite: "auto",
+        }
+      )
+
+      gsap.fromTo(
+        imgs,
+        { scale: 1.15 },
+        { scale: 1, duration: 0.8, stagger: 0.07, ease: "power2.out" },
+        "<"
+      )
+    }, gridRef)
+
+    return () => ctx.revert()
   }, [activeCategory])
 
   return (
     <section
       ref={sectionRef}
-      className="py-24 lg:py-32 relative overflow-hidden bg-background"
+      className="py-24 lg:py-32 relative overflow-hidden bg-background perspective-1000"
     >
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-foreground/5 rounded-full blur-[100px] pointer-events-none" />
+      {/* Ambient Lighting Orbs */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-[120px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-[700px] h-[700px] bg-foreground/5 rounded-full blur-[140px] pointer-events-none translate-y-1/3 -translate-x-1/4" />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 relative z-10">
+        {/* Header */}
         <div className="ps-header flex flex-col items-center text-center mb-14">
           <SectionHeading
             badge="Our Portfolio"
@@ -131,6 +179,7 @@ export function ProjectsShowcase() {
           />
         </div>
 
+        {/* Filter Pills */}
         <div className="flex overflow-x-auto pb-4 mb-12 -mx-6 px-6 sm:mx-0 sm:px-0 sm:pb-0 sm:flex-wrap sm:justify-center gap-2 hide-scrollbar">
           {projectCategories.map((category) => {
             const isActive = activeCategory === category
@@ -151,12 +200,14 @@ export function ProjectsShowcase() {
           })}
         </div>
 
+        {/* Showcase Grid */}
         {displayProjects.length > 0 ? (
           <div
             ref={gridRef}
             className="flex flex-col lg:flex-row gap-5 lg:gap-6 lg:h-[680px]"
           >
-            <div className="project-animate relative w-full lg:w-[42%] lg:flex-shrink-0 h-[480px] sm:h-[560px] lg:h-full overflow-hidden rounded-3xl shadow-lg">
+            {/* LARGE PORTRAIT CARD */}
+            <div className="featured-card-wrapper project-animate-item relative w-full lg:w-[42%] lg:flex-shrink-0 h-[480px] sm:h-[560px] lg:h-full overflow-hidden rounded-3xl shadow-xl bg-muted/30">
               <ProjectCard
                 project={displayProjects[0]}
                 variant="featured"
@@ -164,11 +215,12 @@ export function ProjectsShowcase() {
               />
             </div>
 
+            {/* 4 SMALL CARDS (2x2 Grid) */}
             <div className="w-full lg:flex-1 grid grid-cols-2 grid-rows-2 gap-5 lg:gap-6 h-[420px] sm:h-[480px] lg:h-full">
               {displayProjects.slice(1, 5).map((project) => (
                 <div
                   key={project.id}
-                  className="project-animate relative min-h-0 overflow-hidden rounded-2xl shadow-md"
+                  className="small-card-wrapper project-animate-item relative min-h-0 overflow-hidden rounded-2xl shadow-md bg-muted/30"
                 >
                   <ProjectCard
                     project={project}
@@ -190,6 +242,7 @@ export function ProjectsShowcase() {
           </div>
         )}
 
+        {/* Bottom CTA Button */}
         <div className="mt-14 text-center">
           <Link href="/projects">
             <Button

@@ -5,9 +5,9 @@ export const projectsData = [
     category: "Landscaping",
     description:
       "A complete landscape transformation for a luxury villa featuring Mediterranean-inspired gardens, custom water features, and ambient lighting throughout.",
-    image: "/images/10.jpg",
-    beforeImage: "/images/19.jpg",
-    afterImage: "/images/20.jpg",
+    image: "/images/10.jpeg",
+    beforeImage: "/images/19.jpeg",
+    afterImage: "/images/20.jpeg",
     location: "Dubai Hills, UAE",
     year: "2024",
     featured: true,
@@ -40,7 +40,7 @@ export const projectsData = [
     category: "Landscaping",
     description:
       "Transforming a barren backyard into a resort-style oasis with lush tropical plants, a fire pit area, and custom stonework pathways.",
-    image: "/images/13.jpg",
+    image: "/images/13.webp",
     location: "Sharjah, UAE",
     year: "2023",
     featured: false,
@@ -51,7 +51,7 @@ export const projectsData = [
     category: "Commercial",
     description:
       "Large-scale commercial landscaping project including irrigation systems, seasonal flower beds, and sustainable plant selections.",
-    image: "/images/14.jpg",
+    image: "/images/14.webp",
     location: "Dubai Marina, UAE",
     year: "2024",
     featured: true,
